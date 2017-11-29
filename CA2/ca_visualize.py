@@ -112,14 +112,3 @@ ca = CelluarAutomata(2, 1, 110)
 
 gui = GUI(ca)
 gui.start()
-'''
-config = [0] * 10
-config[2] = 1
-config[8] = 1
-config[9] = 1
-rule = build_rule_set(34, 2, 1)
-print(config)
-print(rule)
-print(step(config, rule, 1, 2))
-
-'''
