@@ -68,10 +68,11 @@ class CelluarAutomata(Model):
 
         self.make_param('k', k)
         self.make_param('r', r)
+        self.make_param('height', 50)
+        self.make_param('width', 100)
 
         self.t = 0
-        self.height = 50
-        self.width = 100
+
         self.config = np.zeros([self.height, self.width])
         self.config[0, :] = self.setup_initial_row()
 
@@ -107,7 +108,7 @@ class CelluarAutomata(Model):
         plt.axis('image')
 
 
-ca = CelluarAutomata(2, 1, 220)
+ca = CelluarAutomata(2, 1, 110)
 
 gui = GUI(ca)
 gui.start()
