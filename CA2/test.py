@@ -1,4 +1,6 @@
 from itertools import chain
+from pyics import *
+import numpy as np
 
 
 def decimal_to_base(num, base):
@@ -49,17 +51,67 @@ def find_neighborhood(config, cell_index, r):
 
 
 def step(config, rule, r, k):
-    new_config = [0] * len(config)
+    new_config = np.zeros([len(config)])
 
     for cell_index in range(0, len(config)):
         neighborhood = find_neighborhood(config, cell_index, r)
-        index_in_rule = len(rule) - base_to_decimal(neighborhood, k) - 1
+        index_in_rule = int(len(rule) - base_to_decimal(neighborhood, k) - 1)
         new_cell_value = rule[index_in_rule]
         new_config[cell_index] = new_cell_value
 
     return new_config
 
 
+class CelluarAutomata(Model):
+    def __init__(self, k, r, n):
+        super().__init__()
+
+        self.make_param('k', k)
+        self.make_param('r', r)
+
+        self.t = 0
+        self.height = 50
+        self.width = 100
+        self.config = np.zeros([self.height, self.width])
+        self.config[0, :] = self.setup_initial_row()
+
+        self.n = n
+        self.rule = build_rule_set(n, k, r)
+
+    def setup_initial_row(self):
+        init_row = np.zeros(self.width)
+        init_row[int(self.width / 2)] = 1
+        return init_row
+
+    def step(self):
+        self.t += 1
+        if self.t >= self.height:
+            return True
+
+        new_config = step(self.config[self.t - 1], self.rule, self.r, self.k)
+        self.config[self.t] = new_config
+
+    def reset(self):
+        self.config = np.zeros([self.height, self.width])
+        self.config[0, :] = self.setup_initial_row()
+
+    def draw(self):
+        import matplotlib
+        import matplotlib.pyplot as plt
+
+        plt.cla()
+        if not plt.gca().yaxis_inverted():
+            plt.gca().invert_yaxis()
+        plt.imshow(self.config, interpolation='none', vmin=0, vmax=self.k - 1,
+                   cmap=matplotlib.cm.binary)
+        plt.axis('image')
+
+
+ca = CelluarAutomata(2, 1, 220)
+
+gui = GUI(ca)
+gui.start()
+'''
 config = [0] * 10
 config[2] = 1
 config[8] = 1
@@ -68,3 +120,5 @@ rule = build_rule_set(34, 2, 1)
 print(config)
 print(rule)
 print(step(config, rule, 1, 2))
+
+'''
